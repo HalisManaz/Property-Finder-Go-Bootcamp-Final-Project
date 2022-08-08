@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-func calculateDiscount(Basket basketProducts, u *User, paymentOrCheck string) (discountAmount float64) {
+func CalculateDiscount(Basket basketProducts, u *User, paymentOrCheck string) (discountAmount float64) {
 	var allDiscounts = []float64{0.0}
 	var discount, basketTotalPrice float64
 

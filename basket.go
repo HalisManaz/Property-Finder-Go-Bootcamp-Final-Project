@@ -32,7 +32,7 @@ func ListAllProductsInBasket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//ActiveUser.CheckUserDiscount()
-	Discount = calculateDiscount(Basket, ActiveUser, "Check")
+	Discount = CalculateDiscount(Basket, ActiveUser, "Check")
 	fmt.Fprintf(w, "BASKET\n---------------------------------------\n")
 	json.NewEncoder(w).Encode(Basket)
 	for _, item := range Basket {

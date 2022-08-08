@@ -46,7 +46,7 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 			} else {
 				// If user is logging and payment accepted, payment are done.
 				_, _ = fmt.Fprint(w, "Payment are done!\n")
-				Discount = calculateDiscount(Basket, ActiveUser, "Payment")
+				Discount = CalculateDiscount(Basket, ActiveUser, "Payment")
 				_, _ = fmt.Fprintf(w, "BASKET\n---------------------------------------\n")
 				err := json.NewEncoder(w).Encode(Basket)
 
