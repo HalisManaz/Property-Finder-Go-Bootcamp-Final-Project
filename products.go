@@ -18,12 +18,13 @@ type Product struct {
 
 func addProduct(w http.ResponseWriter, r *http.Request) {
 	productId := mux.Vars(r)["id"]
-	//db, err := ConnectSQL("ordersdb")
+	// Check user logging or not
 	if ActiveUser == &emptyUser || ActiveUser == nil {
 		fmt.Fprintf(w, "There is no active user. Please assign or login user!")
 		return
 	}
 
+	// Take product from SQL database
 	singleProduct, err := GetProductFromDatabase(productId)
 	if err != nil {
 		errMessage := fmt.Sprint(err)
@@ -32,6 +33,7 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(Basket) == 0 {
+		// Add product if basket is empty
 		AddedProduct := ProductInBasket{singleProduct, 1, orderID}
 		Basket = append(Basket, AddedProduct)
 		w.WriteHeader(http.StatusCreated)
@@ -40,11 +42,13 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 	} else {
 		singleProductInBasket := GetProductFromBasket(singleProduct)
 		if singleProductInBasket != EmptyProductInBasket {
+			// If product is also available in basket
 			IncreaseAmount(singleProductInBasket)
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(Basket)
 			return
 		} else {
+			// If product is not available in basket
 			AddedProduct := ProductInBasket{singleProduct, 1, orderID}
 			Basket = append(Basket, AddedProduct)
 			w.WriteHeader(http.StatusCreated)
@@ -62,8 +66,6 @@ func GetProductFromDatabase(productId string) (Product, error) {
 		return Product{}, err
 	}
 	res, err := db.Query("SELECT * FROM products WHERE id = ?", productId)
-
-	//defer res.Close()
 
 	if err != nil {
 		log.Fatal(err)

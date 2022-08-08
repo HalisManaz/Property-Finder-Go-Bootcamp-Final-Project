@@ -16,6 +16,7 @@ import (
 var orderID int
 var emptyUser User
 
+// Homepage
 func homeLink(w http.ResponseWriter, _ *http.Request) {
 	_, err := fmt.Fprintf(w, "Welcome PF Market\n"+
 		"If there are more than 3 items of the same product, then fourth and subsequent ones would have 8 percent off.\n"+
