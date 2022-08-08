@@ -14,6 +14,11 @@ type ProductInBasket struct {
 	OrderID int     `json:"OrderID"`
 }
 
+type UserAndOrder struct {
+	UserID  string `json:"UserID"`
+	OrderID int    `json:"OrderID"`
+}
+
 type basketProducts []ProductInBasket
 
 var EmptyProductInBasket ProductInBasket
@@ -39,6 +44,7 @@ func ListAllProductsInBasket(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Total Amount: %.2f\nDiscount: %.2f\nTax Amount: %.2f\nAmount Due: %.2f",
 		TotalPrice, Discount, TaxAmount, AmountDue)
 }
+
 func AllPastOrders(w http.ResponseWriter, r *http.Request) {
 	userID := mux.Vars(r)["id"]
 

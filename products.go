@@ -83,6 +83,26 @@ func GetProductFromDatabase(productId string) (Product, error) {
 	return Product{}, errors.New(fmt.Sprintf("a product with this ID %v does not exist in the product database", productId))
 }
 
+func GetProductFromBasket(singleProduct Product) ProductInBasket {
+	for _, singleProductInBasket := range Basket {
+		if singleProductInBasket.Product == singleProduct {
+			return singleProductInBasket
+		}
+	}
+	return ProductInBasket{}
+}
+
+func IncreaseAmount(productInBasket ProductInBasket) {
+	productInBasketId := productInBasket.Product.ID
+	//db, _ := ConnectSQL("ordersdb")
+	for index, singleProductInBasket := range Basket {
+		if singleProductInBasket.Product.ID == productInBasketId {
+			singleProductInBasket.Amount = singleProductInBasket.Amount + 1
+			Basket = append(Basket[:index], singleProductInBasket)
+		}
+	}
+}
+
 func ListAllProducts(w http.ResponseWriter, r *http.Request) {
 	db, err := ConnectSQL("ordersdb")
 	rows, err := db.Query("SELECT * FROM products;")
@@ -113,6 +133,7 @@ func ListAllProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	return
 }
+
 func dropProduct(w http.ResponseWriter, r *http.Request) {
 	productId := mux.Vars(r)["id"]
 	var updatedProductInBasket ProductInBasket
@@ -131,6 +152,7 @@ func dropProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "There is no product with this ID %v in the basket", productId)
 }
+
 func deleteProduct(w http.ResponseWriter, r *http.Request) {
 	productId := mux.Vars(r)["id"]
 	if len(Basket) == 0 {
@@ -145,25 +167,5 @@ func deleteProduct(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		fmt.Fprintf(w, "There is no product with this ID %v in the basket", productId)
-	}
-}
-
-func GetProductFromBasket(singleProduct Product) ProductInBasket {
-	for _, singleProductInBasket := range Basket {
-		if singleProductInBasket.Product == singleProduct {
-			return singleProductInBasket
-		}
-	}
-	return ProductInBasket{}
-}
-
-func IncreaseAmount(productInBasket ProductInBasket) {
-	productInBasketId := productInBasket.Product.ID
-	//db, _ := ConnectSQL("ordersdb")
-	for index, singleProductInBasket := range Basket {
-		if singleProductInBasket.Product.ID == productInBasketId {
-			singleProductInBasket.Amount = singleProductInBasket.Amount + 1
-			Basket = append(Basket[:index], singleProductInBasket)
-		}
 	}
 }

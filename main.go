@@ -28,17 +28,6 @@ func homeLink(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
-func ConnectSQL(sqldb string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:sqlpassword@tcp(127.0.0.1:3306)/"+sqldb)
-	//defer db.Close()
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db, err
-}
-
 func Payment(w http.ResponseWriter, r *http.Request) {
 	var TotalPrice, TaxAmount, Discount, AmountDue float64
 	paymentDecide := mux.Vars(r)["decide"]
@@ -87,9 +76,21 @@ func Payment(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func ConnectSQL(sqldb string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", "root:sqlpassword@tcp(127.0.0.1:3306)/"+sqldb)
+	//defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db, err
+}
+
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
+	router.HandleFunc("/products", ListAllProducts).Methods("GET")
 	router.HandleFunc("/product/{id}", addProduct).Methods("POST")
 	router.HandleFunc("/basket/{id}", dropProduct).Methods("PATCH")
 	router.HandleFunc("/basket/{id}", deleteProduct).Methods("DELETE")
@@ -100,4 +101,5 @@ func main() {
 	router.HandleFunc("/setActiveUser/{id}", SetActiveUser).Methods("GET")
 	router.HandleFunc("/pastOrders/{id}", AllPastOrders).Methods("GET")
 
+	log.Fatalln(http.ListenAndServe(":8080", router))
 }
