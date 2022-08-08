@@ -48,6 +48,17 @@ func (u *User) PaymentDone(Basket basketProducts, TotalPrice, TaxAmount, Discoun
 		log.Fatal(err)
 	}
 }
+
+func (u User) CreateUser(UserName string) (user User) {
+	rand.Seed(time.Now().UnixNano())
+	u.ID = fmt.Sprint(rand.Intn(1000))
+	u.UserName = UserName
+	u.Type = "Normal"
+	u.Streak = 0
+	u.MonthlyTotal = 0.0
+	return u
+}
+
 func CreateNewUser(w http.ResponseWriter, r *http.Request) {
 	var newUser User
 	reqBody, err := ioutil.ReadAll(r.Body)
