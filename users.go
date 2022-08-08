@@ -1,6 +1,12 @@
 package main
 
-import "log"
+import (
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+)
 
 var ActiveUser *User
 
@@ -38,4 +44,43 @@ func (u *User) PaymentDone(Basket basketProducts, TotalPrice, TaxAmount, Discoun
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+func CreateNewUser(w http.ResponseWriter, r *http.Request) {
+	var newUser User
+	reqBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Fprintf(w, "Invalid input for creating user")
+	}
+	json.Unmarshal(reqBody, &newUser)
+	newUser = newUser.CreateUser(newUser.UserName)
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newUser)
+	db, err := ConnectSQL("ordersdb")
+	_, err = db.Query("INSERT INTO users(ID, UserName,Type,Streak,MonthlyTotal) VALUES (?,?,?,?,?)", newUser.ID, newUser.UserName, newUser.Type, newUser.Streak, newUser.MonthlyTotal)
+
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
+func ListAllUser(w http.ResponseWriter, r *http.Request) {
+	db, err := ConnectSQL("ordersdb")
+	res, err := db.Query("SELECT * FROM users")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for res.Next() {
+
+		var user User
+		err := res.Scan(&user.ID, &user.UserName, &user.Type, &user.Streak, &user.MonthlyTotal)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		json.NewEncoder(w).Encode(user)
+	}
+
 }

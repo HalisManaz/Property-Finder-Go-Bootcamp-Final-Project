@@ -95,5 +95,7 @@ func main() {
 	router.HandleFunc("/basket/{id}", deleteProduct).Methods("DELETE")
 	router.HandleFunc("/basket", ListAllProductsInBasket).Methods("GET")
 	router.HandleFunc("/payment/{decide}", Payment).Methods("GET")
+	router.HandleFunc("/users", ListAllUser).Methods("GET")
+	router.HandleFunc("/user", CreateNewUser).Methods("POST")
 
 }
