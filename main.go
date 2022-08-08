@@ -2,11 +2,15 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 	"log"
+	"math/rand"
 	"net/http"
+	"strings"
+	"time"
 )
 
 var orderID int
@@ -35,6 +39,54 @@ func ConnectSQL(sqldb string) (*sql.DB, error) {
 	return db, err
 }
 
+func Payment(w http.ResponseWriter, r *http.Request) {
+	var TotalPrice, TaxAmount, Discount, AmountDue float64
+	paymentDecide := mux.Vars(r)["decide"]
+	// When payment declined
+	if strings.ToLower(paymentDecide) == "y" {
+		if len(Basket) == 0 {
+			_, _ = fmt.Fprint(w, "Basket is empty! Please fill the basket to pay")
+			return
+		} else {
+			// When payment accepted
+			// Check user is logging or not
+			if ActiveUser == &emptyUser || ActiveUser == nil {
+				_, _ = fmt.Fprint(w, "There is no active user. Please assign or login user!")
+				return
+			} else {
+				// If user is logging and payment accepted, payment are done.
+				_, _ = fmt.Fprint(w, "Payment are done!\n")
+				Discount = calculateDiscount(Basket, ActiveUser, "Payment")
+				_, _ = fmt.Fprintf(w, "BASKET\n---------------------------------------\n")
+				err := json.NewEncoder(w).Encode(Basket)
+
+				if err != nil {
+					return
+				}
+
+				for _, item := range Basket {
+					TotalPrice += item.Product.Price * float64(item.Amount)
+					TaxAmount += item.Product.Price * float64(item.Amount) * (item.Product.TaxRate / 100)
+				}
+				_, _ = fmt.Fprintf(w, "RECEIPT\n---------------------------------------\n")
+				AmountDue = TotalPrice - Discount
+				_, _ = fmt.Fprintf(w, "Total Amount: %.2f\nDiscount: %.2f\nTax Amount: %.2f\nAmount Due: %.2f", TotalPrice, Discount, TaxAmount, AmountDue)
+				ActiveUser.PaymentDone(Basket, TotalPrice, TaxAmount, Discount, AmountDue)
+				Basket = basketProducts{}
+				rand.Seed(time.Now().UnixNano())
+				orderID = rand.Intn(100_000_000)
+				return
+			}
+		}
+	} else if strings.ToLower(paymentDecide) == "n" {
+		_, err := fmt.Fprint(w, "Payment declined")
+		if err != nil {
+			return
+		}
+		return
+	}
+}
+
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
@@ -42,5 +94,6 @@ func main() {
 	router.HandleFunc("/basket/{id}", dropProduct).Methods("PATCH")
 	router.HandleFunc("/basket/{id}", deleteProduct).Methods("DELETE")
 	router.HandleFunc("/basket", ListAllProductsInBasket).Methods("GET")
+	router.HandleFunc("/payment/{decide}", Payment).Methods("GET")
 
 }
