@@ -56,6 +56,6 @@ Implemented well-known REST API patterns. Created their own errors for error han
 
 ---
 ## Thanks
-Property Finder
-Patika.dev
-Akın Kaldıroğlu
+* Property Finder
+* Patika.dev
+* Akın Kaldıroğlu
