@@ -1,5 +1,7 @@
 package main
 
+var ActiveUser *User
+
 type User struct {
 	ID           string  `json:"ID"`
 	UserName     string  `json:"UserName"`
