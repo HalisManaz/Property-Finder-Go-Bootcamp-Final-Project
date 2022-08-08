@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+var emptyUser User
+
 func homeLink(w http.ResponseWriter, _ *http.Request) {
 	_, err := fmt.Fprintf(w, "Welcome PF Market\n"+
 		"If there are more than 3 items of the same product, then fourth and subsequent ones would have 8 percent off.\n"+
@@ -35,4 +37,5 @@ func ConnectSQL(sqldb string) (*sql.DB, error) {
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
+	router.HandleFunc("/product/{id}", addProduct).Methods("POST")
 }
