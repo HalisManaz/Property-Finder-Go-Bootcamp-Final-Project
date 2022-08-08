@@ -53,3 +53,9 @@ In addition, Golang for business logic and `Postman` for unit testing and REST A
 ## Conclusion
 &nbsp;&nbsp;&nbsp;&nbsp;While developing the project, attention was paid to coupling and cohesion. Attempted to apply clean code and clean architecture principles.
 Implemented well-known REST API patterns. Created their own errors for error handling in project.
+
+---
+## Thanks
+Property Finder
+Patika.dev
+Akın Kaldıroğlu
