@@ -3,9 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 var ActiveUser *User
@@ -83,4 +86,38 @@ func ListAllUser(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(user)
 	}
 
+}
+func SetActiveUser(w http.ResponseWriter, r *http.Request) {
+	ActiveUserID := mux.Vars(r)["id"]
+	db, err := ConnectSQL("ordersdb")
+
+	res, err := db.Query("SELECT * FROM users WHERE id = ?", ActiveUserID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if res.Next() {
+
+		var user User
+		err := res.Scan(&user.ID, &user.UserName, &user.Type, &user.Streak, &user.MonthlyTotal)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if ActiveUser != nil {
+			if ActiveUser.ID == user.ID {
+				fmt.Fprintf(w, "Active user already selected user!")
+				return
+			} else {
+				orderID = rand.Intn(10000)
+				Basket = basketProducts{}
+			}
+		}
+
+		ActiveUser = &user
+		rand.Seed(time.Now().UnixNano())
+		orderID = rand.Intn(100_000_000)
+		json.NewEncoder(w).Encode(ActiveUser)
+	}
 }

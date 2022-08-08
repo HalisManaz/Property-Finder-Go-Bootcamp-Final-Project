@@ -97,5 +97,5 @@ func main() {
 	router.HandleFunc("/payment/{decide}", Payment).Methods("GET")
 	router.HandleFunc("/users", ListAllUser).Methods("GET")
 	router.HandleFunc("/user", CreateNewUser).Methods("POST")
-
+	router.HandleFunc("/setActiveUser/{id}", SetActiveUser).Methods("GET")
 }
