@@ -18,7 +18,7 @@ func CalculateDiscount(Basket basketProducts, u *User, paymentOrCheck string) (d
 	streakAmount := 100.0
 	streakDiscountsProductIDs := []string{"1", "4", "7"}
 
-	// Part a
+	// Part a OK!
 	if (u.Streak+1)%4.0 == 0 && u.Streak != 0 {
 		for _, productInBasket := range Basket {
 			if slices.Contains(streakDiscountsProductIDs, productInBasket.Product.ID) {
@@ -39,7 +39,7 @@ func CalculateDiscount(Basket basketProducts, u *User, paymentOrCheck string) (d
 		}
 	}
 
-	// Part b
+	// Part b OK!
 	for _, productInBasket := range Basket {
 		if productInBasket.Amount > 3 {
 			discount = (float64(productInBasket.Amount) - 3) * productInBasket.Product.Price * 0.08
@@ -47,7 +47,7 @@ func CalculateDiscount(Basket basketProducts, u *User, paymentOrCheck string) (d
 		}
 	}
 
-	// Part c
+	// Part c OK!
 	mountlyLimit := 500.0
 	if u.MonthlyTotal > mountlyLimit {
 		(*u).Type = "Premium"

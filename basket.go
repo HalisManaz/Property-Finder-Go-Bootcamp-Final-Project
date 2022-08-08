@@ -53,7 +53,7 @@ func AllPastOrders(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, err := ConnectSQL("ordersdb")
+	db, err := ConnectSQL("db")
 
 	if err != nil {
 		log.Fatalln(err)

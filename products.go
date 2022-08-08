@@ -18,13 +18,12 @@ type Product struct {
 
 func addProduct(w http.ResponseWriter, r *http.Request) {
 	productId := mux.Vars(r)["id"]
-	// Check user logging or not
+	//db, err := ConnectSQL("db")
 	if ActiveUser == &emptyUser || ActiveUser == nil {
 		fmt.Fprintf(w, "There is no active user. Please assign or login user!")
 		return
 	}
 
-	// Take product from SQL database
 	singleProduct, err := GetProductFromDatabase(productId)
 	if err != nil {
 		errMessage := fmt.Sprint(err)
@@ -33,7 +32,6 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if len(Basket) == 0 {
-		// Add product if basket is empty
 		AddedProduct := ProductInBasket{singleProduct, 1, orderID}
 		Basket = append(Basket, AddedProduct)
 		w.WriteHeader(http.StatusCreated)
@@ -42,13 +40,11 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 	} else {
 		singleProductInBasket := GetProductFromBasket(singleProduct)
 		if singleProductInBasket != EmptyProductInBasket {
-			// If product is also available in basket
 			IncreaseAmount(singleProductInBasket)
 			w.WriteHeader(http.StatusCreated)
 			json.NewEncoder(w).Encode(Basket)
 			return
 		} else {
-			// If product is not available in basket
 			AddedProduct := ProductInBasket{singleProduct, 1, orderID}
 			Basket = append(Basket, AddedProduct)
 			w.WriteHeader(http.StatusCreated)
@@ -59,13 +55,15 @@ func addProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetProductFromDatabase(productId string) (Product, error) {
-	db, err := ConnectSQL("ordersdb")
+	db, err := ConnectSQL("db")
 
 	if err != nil {
 		log.Fatal(err)
 		return Product{}, err
 	}
 	res, err := db.Query("SELECT * FROM products WHERE id = ?", productId)
+
+	//defer res.Close()
 
 	if err != nil {
 		log.Fatal(err)
@@ -96,7 +94,7 @@ func GetProductFromBasket(singleProduct Product) ProductInBasket {
 
 func IncreaseAmount(productInBasket ProductInBasket) {
 	productInBasketId := productInBasket.Product.ID
-	//db, _ := ConnectSQL("ordersdb")
+	//db, _ := ConnectSQL("db")
 	for index, singleProductInBasket := range Basket {
 		if singleProductInBasket.Product.ID == productInBasketId {
 			singleProductInBasket.Amount = singleProductInBasket.Amount + 1
@@ -106,7 +104,7 @@ func IncreaseAmount(productInBasket ProductInBasket) {
 }
 
 func ListAllProducts(w http.ResponseWriter, r *http.Request) {
-	db, err := ConnectSQL("ordersdb")
+	db, err := ConnectSQL("db")
 	rows, err := db.Query("SELECT * FROM products;")
 	if err != nil {
 		fmt.Println(err)

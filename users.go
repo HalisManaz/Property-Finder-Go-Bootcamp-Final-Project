@@ -49,7 +49,7 @@ func (u User) CreateUser(UserName string) (user User) {
 }
 
 func (u *User) PaymentDone(Basket basketProducts, TotalPrice, TaxAmount, Discount, AmountDue float64) {
-	db, _ := ConnectSQL("ordersdb")
+	db, _ := ConnectSQL("db")
 	for _, productInBasket := range Basket {
 		_, err := db.Query("INSERT INTO basket(ID, Name,TaxRate,Price,Amount,OrderID) VALUES (?,?,?,?,?,?)",
 			productInBasket.Product.ID, productInBasket.Product.Name, productInBasket.Product.TaxRate,
@@ -78,7 +78,7 @@ func (u *User) PaymentDone(Basket basketProducts, TotalPrice, TaxAmount, Discoun
 
 func SetActiveUser(w http.ResponseWriter, r *http.Request) {
 	ActiveUserID := mux.Vars(r)["id"]
-	db, err := ConnectSQL("ordersdb")
+	db, err := ConnectSQL("db")
 
 	res, err := db.Query("SELECT * FROM users WHERE id = ?", ActiveUserID)
 	if err != nil {
@@ -112,7 +112,7 @@ func SetActiveUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func ListAllUser(w http.ResponseWriter, r *http.Request) {
-	db, err := ConnectSQL("ordersdb")
+	db, err := ConnectSQL("db")
 	res, err := db.Query("SELECT * FROM users")
 
 	if err != nil {
@@ -143,7 +143,7 @@ func CreateNewUser(w http.ResponseWriter, r *http.Request) {
 	newUser = newUser.CreateUser(newUser.UserName)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newUser)
-	db, err := ConnectSQL("ordersdb")
+	db, err := ConnectSQL("db")
 	_, err = db.Query("INSERT INTO users(ID, UserName,Type,Streak,MonthlyTotal) VALUES (?,?,?,?,?)", newUser.ID, newUser.UserName, newUser.Type, newUser.Streak, newUser.MonthlyTotal)
 
 	if err != nil {
