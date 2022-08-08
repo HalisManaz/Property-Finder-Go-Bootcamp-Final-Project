@@ -131,3 +131,19 @@ func dropProduct(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, "There is no product with this ID %v in the basket", productId)
 }
+func deleteProduct(w http.ResponseWriter, r *http.Request) {
+	productId := mux.Vars(r)["id"]
+	if len(Basket) == 0 {
+		fmt.Fprintf(w, "There is no product in basket!")
+		return
+	} else {
+		for index, singleProductInBasket := range Basket {
+			if singleProductInBasket.Product.ID == productId {
+				Basket = append(Basket[:index], Basket[index+1:]...)
+				fmt.Fprintf(w, "The product with ID %v has been deleted successfully", productId)
+				return
+			}
+		}
+		fmt.Fprintf(w, "There is no product with this ID %v in the basket", productId)
+	}
+}
