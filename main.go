@@ -38,4 +38,6 @@ func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
 	router.HandleFunc("/product/{id}", addProduct).Methods("POST")
+	router.HandleFunc("/basket/{id}", dropProduct).Methods("PATCH")
+
 }

@@ -113,3 +113,21 @@ func ListAllProducts(w http.ResponseWriter, r *http.Request) {
 	}
 	return
 }
+func dropProduct(w http.ResponseWriter, r *http.Request) {
+	productId := mux.Vars(r)["id"]
+	var updatedProductInBasket ProductInBasket
+	for index, singleProductInBasket := range Basket {
+		if singleProductInBasket.Product.ID == productId {
+			updatedProductInBasket.Product = singleProductInBasket.Product
+			updatedProductInBasket.Amount = singleProductInBasket.Amount - 1
+			if updatedProductInBasket.Amount == 0 {
+				deleteProduct(w, r)
+				return
+			}
+			Basket[index] = updatedProductInBasket
+			json.NewEncoder(w).Encode(updatedProductInBasket)
+			return
+		}
+	}
+	fmt.Fprintf(w, "There is no product with this ID %v in the basket", productId)
+}
