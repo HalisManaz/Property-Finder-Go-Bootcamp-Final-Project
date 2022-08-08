@@ -6,6 +6,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
@@ -15,8 +16,8 @@ import (
 
 var orderID int
 var emptyUser User
+var sqlCheck = true
 
-// Homepage
 func homeLink(w http.ResponseWriter, _ *http.Request) {
 	_, err := fmt.Fprintf(w, "Welcome PF Market\n"+
 		"If there are more than 3 items of the same product, then fourth and subsequent ones would have 8 percent off.\n"+
@@ -89,6 +90,12 @@ func ConnectSQL(sqldb string) (*sql.DB, error) {
 }
 
 func main() {
+	if sqlCheck {
+		// Please insert your sql username and password!!
+		createSql("root", "sqlpassword")
+		sqlCheck = false
+	}
+
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
 	router.HandleFunc("/products", ListAllProducts).Methods("GET")
@@ -103,4 +110,32 @@ func main() {
 	router.HandleFunc("/pastOrders/{id}", AllPastOrders).Methods("GET")
 
 	log.Fatalln(http.ListenAndServe(":8080", router))
+}
+
+func createSql(root, password string) {
+	db, err := sql.Open("mysql", root+":"+password+"@tcp(127.0.0.1:3306)/")
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = db.Exec("CREATE DATABASE db")
+	if err != nil {
+		fmt.Println("Database also exits!")
+		return
+	}
+
+	if err != nil {
+		fmt.Errorf("Database connection error")
+	}
+	file, err := ioutil.ReadFile("./createSqlDb.sql")
+
+	if err != nil {
+		// handle error
+	}
+
+	requests := strings.Split(string(file), ";")
+
+	for _, request := range requests {
+		_, _ = db.Exec(request)
+	}
 }
