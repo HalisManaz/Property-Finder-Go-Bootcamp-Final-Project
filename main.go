@@ -90,6 +90,7 @@ func ConnectSQL(sqldb string) (*sql.DB, error) {
 }
 
 func main() {
+	// Postman json link to debugging: https://www.getpostman.com/collections/8588445cd43fb4ed14c3
 	if sqlCheck {
 		// Please insert your sql username and password!!
 		createSql("root", "sqlpassword")
