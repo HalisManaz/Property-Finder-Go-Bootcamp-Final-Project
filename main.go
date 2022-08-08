@@ -41,5 +41,6 @@ func main() {
 	router.HandleFunc("/product/{id}", addProduct).Methods("POST")
 	router.HandleFunc("/basket/{id}", dropProduct).Methods("PATCH")
 	router.HandleFunc("/basket/{id}", deleteProduct).Methods("DELETE")
+	router.HandleFunc("/basket", ListAllProductsInBasket).Methods("GET")
 
 }
