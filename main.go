@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
+	"log"
 	"net/http"
 )
 
@@ -18,6 +20,18 @@ func homeLink(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 }
+
+func ConnectSQL(sqldb string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", "root:sqlpassword@tcp(127.0.0.1:3306)/"+sqldb)
+	//defer db.Close()
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db, err
+}
+
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
