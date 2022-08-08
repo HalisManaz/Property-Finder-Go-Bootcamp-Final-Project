@@ -5,3 +5,9 @@ type ProductInBasket struct {
 	Amount  int     `json:"Amount"`
 	OrderID int     `json:"OrderID"`
 }
+
+type basketProducts []ProductInBasket
+
+var EmptyProductInBasket ProductInBasket
+
+var Basket = basketProducts{}

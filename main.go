@@ -9,6 +9,7 @@ import (
 	"net/http"
 )
 
+var orderID int
 var emptyUser User
 
 func homeLink(w http.ResponseWriter, _ *http.Request) {
@@ -39,5 +40,6 @@ func main() {
 	router.HandleFunc("/", homeLink)
 	router.HandleFunc("/product/{id}", addProduct).Methods("POST")
 	router.HandleFunc("/basket/{id}", dropProduct).Methods("PATCH")
+	router.HandleFunc("/basket/{id}", deleteProduct).Methods("DELETE")
 
 }
